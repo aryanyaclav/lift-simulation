@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Customizable Lift Simulation</title>
+    <link rel="stylesheet" href="./index.css">
+   <!-- <style link ="./index.css" /> -->
+</head>
+<body>
+    <div id="config-page">
+        <h1>Lift Simulation Configuration</h1>
+        <input type="number" id="num-floors" min="2" placeholder="Number of Floors">
+        <input type="number" id="num-lifts" min="1" placeholder="Number of Lifts">
+        <button onclick="startSimulation()">Start Simulation</button>
+    </div>
+
+    <div id="simulation-page" style="display: none;">
+        <div class="building" id="building"></div>
+    </div>
+
+    <script src = "./index.js" ></script>
+</body>
+</html>
