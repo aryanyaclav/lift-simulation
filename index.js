@@ -46,8 +46,6 @@ function initializeSimulation() {
     for (let i = 0; i < config.numLifts; i++) {
         const lift = document.createElement('div');
         lift.className = 'lift';
-        lift.textContent = i + 1;
-        lift.style.bottom = '10px';
         lift.style.left = `${10 + i * (config.liftWidth + 10)}px`;
         building.appendChild(lift);
 
@@ -57,7 +55,6 @@ function initializeSimulation() {
             isMoving: false
         });
     }
-
     // Adjust building size
     building.style.width = `${config.buildingWidth + (config.numLifts - 1) * (config.liftWidth + 10)}px`;
 

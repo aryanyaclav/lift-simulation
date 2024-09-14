@@ -32,17 +32,15 @@
     display: flex;
     flex-direction: column-reverse;
     background-color: #fff;
-    padding: 10px;
     border-radius: 5px;
     position: relative;
 }
 
 .floor {
     height: 60px;
-    width: 300px;
+    width: 100%;
     background-color: #f0f0f0;
     border: 1px solid #999;
-    margin: 5px 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -51,7 +49,7 @@
 
 .lift {
     width: 40px;
-    height: 50px;
+    height: 60px;
     background-color: #ff9800;
     position: absolute;
     transition: bottom 0.5s ease-in-out, left 0.5s ease-in-out;
