@@ -1,60 +1,143 @@
-/* Configuration page styles */
-#config-page {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
     height: 100vh;
-    background-color: #f0f0f0;
-}
-
-#config-page input {
-    margin: 10px 0;
-    padding: 5px 10px;
-    width: 200px;
-}
-
-#config-page button {
-    margin-top: 20px;
-    padding: 10px 20px;
-}
-
-/* Simulation page styles */
-#simulation-page {
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     align-items: center;
-    background-color: #ccc;
-    padding: 20px;
+    background-color: #f0f0f0;
+    overflow-y: auto;
+}
+
+#config-page, #simulation-page {
+    text-align: center;
+}
+
+input, button {
+    margin: 10px;
+    padding: 5px;
 }
 
 .building {
-    display: flex;
-    flex-direction: column-reverse;
-    background-color: #fff;
-    border-radius: 5px;
     position: relative;
+    border: 2px solid #333;
+    background-color: white;
 }
 
 .floor {
-    height: 60px;
-    width: 100%;
-    background-color: #f0f0f0;
-    border: 1px solid #999;
+    border-bottom: 1px solid #ccc;
+    position: relative;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 0 10px;
+    justify-content: flex-end;
+    padding-right: 10px;
+}
+
+.floor-number {
+    position: absolute;
+    left: 10px;
+    font-size: 12px;
+}
+
+.buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.call-btn {
+    padding: 5px 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.call-btn:hover {
+    background-color: #45a049;
 }
 
 .lift {
     width: 40px;
-    height: 60px;
     background-color: #ff9800;
     position: absolute;
-    transition: bottom 0.5s ease-in-out, left 0.5s ease-in-out;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: bold;
+    transition: bottom 0.5s ease-in-out;
+}
+
+.lift-doors {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.door {
+    position: absolute;
+    width: 50%;
+    height: 100%;
+    background-color: #333;
+    transition: transform 1s ease;
+}
+
+.door-left {
+    left: 0;
+}
+
+.door-right {
+    right: 0;
+}
+
+.door.open.door-left {
+    transform: translateX(-100%);
+}
+
+.door.open.door-right {
+    transform: translateX(100%);
+}
+
+.passenger-count {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: white;
+    padding: 2px 5px;
+    border-radius: 50%;
+    font-size: 10px;
+}
+
+.floor-indicator {
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: white;
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-size: 10px;
+}
+
+/* Lift status styles */
+.lift[data-status="moving"] {
+    box-shadow: 0 0 10px rgba(255, 152, 0, 0.7);
+}
+
+.lift[data-status="doors-opening"],
+.lift[data-status="doors-closing"] {
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.7);
+}
+
+.lift[data-status="emergency"] {
+    box-shadow: 0 0 10px rgba(244, 67, 54, 0.7);
+}
+
+@media (max-width: 600px) {
+    .lift {
+        width: 30px;
+    }
+    .floor-number, .call-btn, .passenger-count, .floor-indicator {
+        font-size: 8px;
+    }
 }
