@@ -3,13 +3,15 @@ let config = {
     numLifts: 0,
     liftWidth: 40,
     buildingWidth: 300,
-    floorHeight: 60,
-    doorOpenDuration: 2000,
-    liftCapacity: 8
+    floorHeight: 100,
+    doorOpenDuration: 2500,
+    liftCapacity: 8,
+    maxLiftsPerFloor: 2
 };
 
 let lifts = [];
 let callQueue = [];
+let floorLiftCounts = {};
 
 function startSimulation() {
     config.numFloors = parseInt(document.getElementById('num-floors').value);
@@ -31,15 +33,16 @@ function initializeSimulation() {
     building.innerHTML = '';
     lifts = [];
     callQueue = [];
+    floorLiftCounts = {};
 
-    // Calculate floor height based on window height and number of floors
-    config.floorHeight = (window.innerHeight * 0.9) / config.numFloors;
+    for (let i = 1; i <= config.numFloors; i++) {
+        floorLiftCounts[i] = 0;
+    }
 
     for (let i = config.numFloors; i >= 1; i--) {
         const floor = document.createElement('div');
         floor.className = 'floor';
         floor.setAttribute('data-floor', i);
-        floor.style.height = `${config.floorHeight}px`;
         floor.innerHTML = `
             <span class="floor-number">Floor ${i}</span>
             <div class="buttons">
@@ -63,7 +66,6 @@ function initializeSimulation() {
         `;
         lift.style.left = `${10 + i * (config.liftWidth + 10)}px`;
         lift.style.bottom = '0px';
-        lift.style.height = `${config.floorHeight * 0.9}px`; // Make lift slightly shorter than floor height
         building.appendChild(lift);
 
         lifts.push({
@@ -72,12 +74,15 @@ function initializeSimulation() {
             isMoving: false,
             isDoorsOpen: false,
             passengers: [],
-            status: 'idle'
+            status: 'idle',
+            pendingRequests: []
         });
     }
 
-    building.style.width = `${config.buildingWidth + (config.numLifts - 1) * (config.liftWidth + 10)}px`;
+    floorLiftCounts[1] = config.numLifts;
+
     building.style.height = `${config.floorHeight * config.numFloors}px`;
+    building.style.width = `${config.buildingWidth + (config.numLifts - 1) * (config.liftWidth + 10)}px`;
 
     setInterval(dispatchLifts, 100);
 }
@@ -94,47 +99,51 @@ function dispatchLifts() {
 
     const { floorNum, direction } = callQueue[0];
 
-    const bestLift = lifts.reduce((best, lift, index) => {
-        if (lift.isDoorsOpen) return best;
-        
-        const distance = Math.abs(lift.currentFloor - floorNum);
-        let score = lift.isMoving ? distance * 2 : distance;
+    const availableLifts = lifts.filter(lift => 
+        !lift.isMoving && !lift.isDoorsOpen && lift.pendingRequests.length === 0
+    );
 
-        if (lift.isMoving) {
-            const liftDirection = lift.currentFloor < floorNum ? 'up' : 'down';
-            if (liftDirection === direction) {
-                score -= 0.5;
-            }
-        }
+    if (availableLifts.length === 0) return; // All lifts are busy
+
+    const bestLift = availableLifts.reduce((best, lift) => {
+        const distance = Math.abs(lift.currentFloor - floorNum);
+        const score = distance;
 
         if (!best || score < best.score) {
-            return { lift, score, index };
+            return { lift, score };
         }
         return best;
     }, null);
 
-    if (bestLift) {
+    if (bestLift && canMoveLiftToFloor(bestLift.lift, floorNum)) {
         moveLift(bestLift.lift, floorNum);
         callQueue.shift();
     }
+}
+
+function canMoveLiftToFloor(lift, targetFloor) {
+    if (targetFloor === 1) return true; // First floor has no limit
+    return floorLiftCounts[targetFloor] < config.maxLiftsPerFloor;
 }
 
 function moveLift(lift, targetFloor) {
     lift.isMoving = true;
     updateLiftStatus(lift, 'moving');
 
+    floorLiftCounts[lift.currentFloor]--;
+    floorLiftCounts[targetFloor]++;
+
     const distance = (targetFloor - 1) * config.floorHeight;
     const duration = Math.abs(targetFloor - lift.currentFloor);
-    
+
     lift.element.style.transition = `bottom ${duration}s ease-in-out`;
-    
+
     requestAnimationFrame(() => {
         lift.element.style.bottom = `${distance}px`;
     });
 
-    // Update floor indicator during movement
     const startFloor = lift.currentFloor;
-    const totalFrames = duration * 60; // Assuming 60 FPS
+    const totalFrames = duration * 60;
     let frame = 0;
 
     function updateFloorIndicator() {
@@ -157,9 +166,20 @@ function moveLift(lift, targetFloor) {
         setTimeout(() => {
             closeLiftDoors(lift);
             updateLiftStatus(lift, 'idle');
+            handlePendingRequests(lift);
         }, config.doorOpenDuration);
 
     }, duration * 1000);
+}
+
+function handlePendingRequests(lift) {
+    if (callQueue.length > 0) {
+        const nextCall = callQueue[0];
+        if (canMoveLiftToFloor(lift, nextCall.floorNum)) {
+            moveLift(lift, nextCall.floorNum);
+            callQueue.shift();
+        }
+    }
 }
 
 function openLiftDoors(lift) {
@@ -204,21 +224,4 @@ document.getElementById('building').addEventListener('click', (e) => {
         const direction = e.target.getAttribute('data-direction');
         callLift(floor, direction);
     }
-});
-
-// Adjust building size on window resize
-window.addEventListener('resize', () => {
-    config.floorHeight = (window.innerHeight * 0.9) / config.numFloors;
-    const building = document.getElementById('building');
-    building.style.height = `${config.floorHeight * config.numFloors}px`;
-    
-    document.querySelectorAll('.floor').forEach(floor => {
-        floor.style.height = `${config.floorHeight}px`;
-    });
-
-    lifts.forEach(lift => {
-        lift.element.style.height = `${config.floorHeight * 0.9}px`;
-        const newBottom = (lift.currentFloor - 1) * config.floorHeight;
-        lift.element.style.bottom = `${newBottom}px`;
-    });
 });
