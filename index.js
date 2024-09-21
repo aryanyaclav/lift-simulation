@@ -1,11 +1,10 @@
 let config = {
     numFloors: 0,
     numLifts: 0,
-    liftWidth: 40,
+    liftWidth: 50,
     buildingWidth: 300,
-    floorHeight: 100,
+    floorHeight: 150,
     doorOpenDuration: 2500,
-    liftCapacity: 8,
     maxLiftsPerFloor: 2
 };
 
@@ -44,15 +43,17 @@ function initializeSimulation() {
         floor.className = 'floor';
         floor.setAttribute('data-floor', i);
         floor.innerHTML = `
-            <span class="floor-number">Floor ${i}</span>
             <div class="buttons">
-                <button class="call-btn" data-direction="up">Up</button>
-                <button class="call-btn" data-direction="down">Down</button>
+                ${i === config.numFloors ? '' : '<button class="call-btn" data-direction="up"><i class="fas fa-chevron-up"></i></button>'}
+                <div class="floor-number">
+                ${i}
+                </div>
+                ${i === 1 ? '' : '<button class="call-btn" data-direction="down"><i class="fas fa-chevron-down"></i></button>'}
             </div>
+            
         `;
         building.appendChild(floor);
     }
-
     for (let i = 0; i < config.numLifts; i++) {
         const lift = document.createElement('div');
         lift.className = 'lift';
@@ -61,10 +62,14 @@ function initializeSimulation() {
                 <div class="door door-left"></div>
                 <div class="door door-right"></div>
             </div>
-            <div class="passenger-count">0</div>
-            <div class="floor-indicator">1</div>
+            <div class="lift-interior">
+                <div class="lift-indicator">
+                    <div class="direction-indicator"></div>
+                    <div class="floor-display">1</div>
+                </div>
+            </div>
         `;
-        lift.style.left = `${10 + i * (config.liftWidth + 10)}px`;
+        lift.style.left = `${60 + i * (config.liftWidth + 20)}px`;
         lift.style.bottom = '0px';
         building.appendChild(lift);
 
@@ -73,7 +78,6 @@ function initializeSimulation() {
             currentFloor: 1,
             isMoving: false,
             isDoorsOpen: false,
-            passengers: [],
             status: 'idle',
             pendingRequests: []
         });
@@ -84,6 +88,7 @@ function initializeSimulation() {
     building.style.height = `${config.floorHeight * config.numFloors}px`;
     building.style.width = `${config.buildingWidth + (config.numLifts - 1) * (config.liftWidth + 10)}px`;
 
+    addEventListeners();
     setInterval(dispatchLifts, 100);
 }
 
@@ -103,7 +108,7 @@ function dispatchLifts() {
         !lift.isMoving && !lift.isDoorsOpen && lift.pendingRequests.length === 0
     );
 
-    if (availableLifts.length === 0) return; // All lifts are busy
+    if (availableLifts.length === 0) return; 
 
     const bestLift = availableLifts.reduce((best, lift) => {
         const distance = Math.abs(lift.currentFloor - floorNum);
@@ -138,6 +143,9 @@ function moveLift(lift, targetFloor) {
 
     lift.element.style.transition = `bottom ${duration}s ease-in-out`;
 
+    const direction = targetFloor > lift.currentFloor ? 'up' : 'down';
+    updateDirectionIndicator(lift, direction);
+
     requestAnimationFrame(() => {
         lift.element.style.bottom = `${distance}px`;
     });
@@ -150,7 +158,7 @@ function moveLift(lift, targetFloor) {
         if (frame <= totalFrames) {
             const progress = frame / totalFrames;
             const currentFloor = Math.round(startFloor + (targetFloor - startFloor) * progress);
-            lift.element.querySelector('.floor-indicator').textContent = currentFloor;
+            lift.element.querySelector('.floor-display').textContent = currentFloor;
             frame++;
             requestAnimationFrame(updateFloorIndicator);
         }
@@ -160,7 +168,8 @@ function moveLift(lift, targetFloor) {
     setTimeout(() => {
         lift.currentFloor = targetFloor;
         lift.isMoving = false;
-        lift.element.querySelector('.floor-indicator').textContent = targetFloor;
+        lift.element.querySelector('.floor-display').textContent = targetFloor;
+        updateDirectionIndicator(lift, 'idle');
         openLiftDoors(lift);
 
         setTimeout(() => {
@@ -170,6 +179,12 @@ function moveLift(lift, targetFloor) {
         }, config.doorOpenDuration);
 
     }, duration * 1000);
+}
+
+function updateDirectionIndicator(lift, direction) {
+    const indicator = lift.element.querySelector('.direction-indicator');
+    indicator.textContent = direction === 'up' ? '▲' : direction === 'down' ? '▼' : '';
+    indicator.classList.toggle('blinking', direction !== 'idle');
 }
 
 function handlePendingRequests(lift) {
@@ -208,20 +223,17 @@ function addPassengerToLift(lift, destinationFloor) {
     }
 }
 
+function addEventListeners() {
+    document.querySelectorAll('.call-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const floor = parseInt(this.closest('.floor').getAttribute('data-floor'));
+            const direction = this.getAttribute('data-direction');
+            callLift(floor, direction);
+        });
+    });
+}
+
 function updateLiftDisplay(lift) {
-    lift.element.querySelector('.passenger-count').textContent = lift.passengers.length;
+    const floorDisplay = lift.element.querySelector('.floor-display');
+    floorDisplay.textContent = lift.currentFloor;
 }
-
-function emergencyStop(lift) {
-    lift.isMoving = false;
-    lift.element.style.transition = 'none';
-    updateLiftStatus(lift, 'emergency');
-}
-
-document.getElementById('building').addEventListener('click', (e) => {
-    if (e.target.classList.contains('call-btn')) {
-        const floor = parseInt(e.target.closest('.floor').getAttribute('data-floor'));
-        const direction = e.target.getAttribute('data-direction');
-        callLift(floor, direction);
-    }
-});
