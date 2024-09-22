@@ -254,7 +254,7 @@ body {
 }
 
 /* Responsive design */
-@media (max-width: 500px) {
+@media (max-width: 400px) {
     .building {
         width: 100% !important;
     }
