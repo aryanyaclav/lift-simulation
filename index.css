@@ -70,6 +70,7 @@ body {
     justify-content: center;
     align-items: flex-start;
     overflow-y: auto;
+    overflow-x: auto;
     padding: 20px;
     background-color: #ecf0f1;
 }
@@ -80,8 +81,11 @@ body {
     background-color: #f9f9f9;
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
-    width: 200%;
-    /* overflow: hidden; */
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    min-width: 100%; /* Ensure building takes up at least full width */
+    width: max-content; /* Allow building to grow based on content */
 }
 
 .floor {
