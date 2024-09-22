@@ -84,8 +84,7 @@ body {
     display: flex;
     flex-direction: column;
     overflow: auto;
-    min-width: 100%; /* Ensure building takes up at least full width */
-    width: max-content; /* Allow building to grow based on content */
+    width: max-content;
 }
 
 .floor {
