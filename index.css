@@ -253,8 +253,8 @@ body {
     box-shadow: 0 0 20px rgba(231, 76, 60, 0.7);
 }
 
-/* Responsive design */
-@media (max-width: 400px) {
+/* Responsive design
+@media (max-width: px) {
     .building {
         width: 100% !important;
     }
@@ -286,4 +286,4 @@ body {
 .call-btn:disabled:hover {
     transform: scale(1);
     background-color: #95a5a6;
-}
+} */
