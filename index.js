@@ -5,7 +5,8 @@ let config = {
     buildingWidth: 300,
     floorHeight: 150,
     doorOpenDuration: 2500,
-    maxLiftsPerFloor: 2
+    maxLiftsPerFloor: 2,
+    liftSpeed: 2
 };
 
 let lifts = [];
@@ -95,7 +96,14 @@ function initializeSimulation() {
 function callLift(floorNum, direction) {
     const existingCall = callQueue.find(call => call.floorNum === floorNum && call.direction === direction);
     if (!existingCall) {
-        callQueue.push({ floorNum, direction });
+        const liftsOnFloor = lifts.filter(lift => lift.currentFloor === floorNum && !lift.isMoving);
+        if (liftsOnFloor.length > 0) {
+            // If there's already a lift on the floor, open its doors
+            openLiftDoors(liftsOnFloor[0]);
+            setTimeout(() => closeLiftDoors(liftsOnFloor[0]), config.doorOpenDuration);
+        } else {
+            callQueue.push({ floorNum, direction });
+        }
     }
 }
 
@@ -123,11 +131,16 @@ function dispatchLifts() {
     if (bestLift && canMoveLiftToFloor(bestLift.lift, floorNum)) {
         moveLift(bestLift.lift, floorNum);
         callQueue.shift();
+    }else {
+        // If no lift can move to the target floor, remove the call from the queue
+        console.log(`Cannot dispatch lift to floor ${floorNum}. Removing call from queue.`);
+        callQueue.shift();
     }
 }
 
 function canMoveLiftToFloor(lift, targetFloor) {
     if (targetFloor === 1) return true; // First floor has no limit
+    if (lift.currentFloor === targetFloor) return true; // Lift is already on the target floor
     return floorLiftCounts[targetFloor] < config.maxLiftsPerFloor;
 }
 
@@ -139,7 +152,7 @@ function moveLift(lift, targetFloor) {
     floorLiftCounts[targetFloor]++;
 
     const distance = (targetFloor - 1) * config.floorHeight;
-    const duration = Math.abs(targetFloor - lift.currentFloor);
+    const duration = Math.abs(targetFloor - lift.currentFloor) * config.liftSpeed;
 
     lift.element.style.transition = `bottom ${duration}s ease-in-out`;
 
@@ -179,6 +192,7 @@ function moveLift(lift, targetFloor) {
         }, config.doorOpenDuration);
 
     }, duration * 1000);
+
 }
 
 function updateDirectionIndicator(lift, direction) {
@@ -214,13 +228,6 @@ function closeLiftDoors(lift) {
 function updateLiftStatus(lift, status) {
     lift.status = status;
     lift.element.setAttribute('data-status', status);
-}
-
-function addPassengerToLift(lift, destinationFloor) {
-    if (lift.passengers.length < config.liftCapacity) {
-        lift.passengers.push(destinationFloor);
-        updateLiftDisplay(lift);
-    }
 }
 
 function addEventListeners() {

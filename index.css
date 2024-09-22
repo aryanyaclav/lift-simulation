@@ -1,48 +1,69 @@
+ /* General styles */
 body {
     font-family: 'Roboto', Arial, sans-serif;
     margin: 0;
     padding: 0;
-    height: 100vh;
     display: flex;
     flex-direction: column;
     background-color: #f0f0f0;
 }
 
+/* Config page styles */
 #config-page {
     text-align: center;
     padding: 40px;
     background-color: #2c3e50;
     color: white;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 #config-page h1 {
+    font-size: 3rem;
     margin-bottom: 30px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
 }
 
 #config-page input {
     margin: 10px;
-    padding: 10px;
-    font-size: 16px;
+    padding: 15px;
+    font-size: 18px;
     border: none;
-    border-radius: 5px;
+    border-radius: 25px;
+    width: 250px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+#config-page input:focus {
+    outline: none;
+    box-shadow: 0 0 10px rgba(52, 152, 219, 0.7);
 }
 
 #config-page button {
     margin: 20px;
-    padding: 10px 20px;
-    font-size: 18px;
+    padding: 15px 30px;
+    font-size: 20px;
     background-color: #3498db;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 25px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 #config-page button:hover {
     background-color: #2980b9;
+    transform: scale(1.05);
 }
 
+/* Simulation page styles */
 #simulation-page {
     flex-grow: 1;
     display: flex;
@@ -57,75 +78,78 @@ body {
     position: relative;
     border: 2px solid #34495e;
     background-color: #f9f9f9;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    width: 200%;
+    /* overflow: hidden; */
 }
 
 .floor {
-    height: 150px; 
+    height: 150px;
     border-bottom: 1px solid #bdc3c7;
     position: relative;
     display: flex;
     align-items: center;
     padding: 0 20px;
+    transition: background-color 0.3s ease;
 }
 
-.floor-control-panel {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: #34495e;
-    padding: 10px;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+.floor:hover {
+    background-color: #e8e8e8;
 }
+
 
 .floor-number {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: bold;
-    color: #0c9e63;
-    display:flex;
+    color: #2c3e50;
+    display: flex;
     justify-content: center;
     align-items: center;
     margin: 5px 0;
-    height: 25px;
-}
-
-.call-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+    height: 30px;
+    background-color: #ecf0f1;
+    border-radius: 15px;
+    padding: 0 10px;
+    transition: background-color 0.3s ease;
 }
 
 .call-btn {
-    padding: 5px;
+    padding: 8px;
     background-color: #2ecc71;
     color: white;
     border: none;
     cursor: pointer;
-    font-size: 12px;
-    width: 30px;
-    height: 30px;
+    font-size: 14px;
+    width: 36px;
+    height: 36px;
     display: flex;
     justify-content: center;
     align-items: center;
     border-radius: 50%;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease;
 }
 
 .call-btn:hover {
     background-color: #27ae60;
+    transform: scale(1.1);
+}
+
+.call-btn:active {
+    transform: scale(0.95);
 }
 
 .lift {
     width: 60px;
     height: 120px;
-    background-color: #3498db;
+    background-color: #fefefe;
     position: absolute;
-    transition: bottom 2.5s ease-in-out;
+    transition: bottom 0.5s ease-in-out;
     border: 2px solid #2980b9;
     box-sizing: border-box;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
     overflow: hidden;
+    border-radius: 5px;
 }
 
 .lift-doors {
@@ -133,7 +157,7 @@ body {
     width: 100%;
     height: 80%;
     z-index: 2;
-    top:20%;
+    top: 20%;
 }
 
 .door {
@@ -146,20 +170,20 @@ body {
 
 .door-left {
     left: 0;
-    transform-origin: left;
+    transform: translateX(0);
 }
 
 .door-right {
     right: 0;
-    transform-origin: right;
+    transform: translateX(0);
 }
 
 .door.open.door-left {
-    transform: perspective(1000px) rotateY(90deg);
+    transform: translateX(-100%);
 }
 
 .door.open.door-right {
-    transform: perspective(1000px) rotateY(-90deg);
+    transform: translateX(100%);
 }
 
 .lift-interior {
@@ -168,31 +192,34 @@ body {
     height: 90%;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     box-sizing: border-box;
     background-color: #ecf0f1;
 }
 
 .lift-indicator {
-    display: flex;;
+    display: flex;
     align-items: center;
     width: 100%;
     justify-content: space-between;
-    background-color: #34495e;
+    background-color: #2c3e50;
+    padding: 10%;
+    height: 15%;
+    border: #2c3e50 2px solid;
 }
 
 .direction-indicator {
-    width: 20px;
-    height: 20px;
-    background-color: #2c3e50;
+    width: 20%;
+    height: 20%;
+    background-color: #313a59;
     color: white;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 12px;
+    font-size: 80%;
     border-radius: 50%;
-    margin-bottom: 5px;
+    padding-left: 10%;
 }
 
 .floor-display {
@@ -201,31 +228,8 @@ body {
     color: #ecf0f1;
 }
 
-.floor-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 2px;
-}
-
-.floor-buttons button {
-    width: 20px;
-    height: 20px;
-    padding: 0;
-    font-size: 10px;
-    background-color: #3498db;
-    color: white;
-    border: 1px solid #2980b9;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.floor-buttons button:hover {
-    background-color: #2980b9;
-}
-
 .direction-indicator.blinking {
-    animation: blink 1s infinite;
+    animation: blink 1s infinite ease-in-out;
 }
 
 @keyframes blink {
@@ -234,49 +238,19 @@ body {
     100% { opacity: 1; }
 }
 
-
 .lift[data-status="moving"] {
-    box-shadow: 0 0 10px rgba(52, 152, 219, 0.7);
+    box-shadow: 0 0 20px rgba(52, 152, 219, 0.7);
 }
 
 .lift[data-status="doors-opening"], .lift[data-status="doors-closing"] {
-    box-shadow: 0 0 10px rgba(46, 204, 113, 0.7);
+    box-shadow: 0 0 20px rgba(46, 204, 113, 0.7);
 }
 
 .lift[data-status="emergency"] {
-    box-shadow: 0 0 10px rgba(231, 76, 60, 0.7);
+    box-shadow: 0 0 20px rgba(231, 76, 60, 0.7);
 }
 
-.floor-buttons {
-    position: absolute;
-    right: -50px;
-    top: 0;
-    bottom: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    background-color: #ecf0f1;
-    padding: 5px;
-    border-radius: 0 5px 5px 0;
-}
-
-.floor-buttons button {
-    width: 30px;
-    height: 30px;
-    margin: 2px 0;
-    padding: 0;
-    font-size: 12px;
-    background-color: #3498db;
-    color: white;
-    border: 1px solid #2980b9;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.floor-buttons button:hover {
-    background-color: #2980b9;
-}
-
+/* Responsive design */
 @media (max-width: 600px) {
     .building {
         width: 100% !important;
@@ -284,11 +258,11 @@ body {
 
     .lift {
         width: 50px;
-        height: 120px;
+        height: 100px;
     }
 
     .floor-number, .call-btn, .floor-indicator, .direction-indicator {
-        font-size: 10px;
+        font-size: 12px;
     }
 
     .floor {
@@ -296,7 +270,17 @@ body {
     }
 
     .call-btn {
-        width: 25px;
-        height: 25px;
+        width: 30px;
+        height: 30px;
     }
+}
+
+.call-btn:disabled {
+    background-color: #95a5a6;
+    cursor: not-allowed;
+}
+
+.call-btn:disabled:hover {
+    transform: scale(1);
+    background-color: #95a5a6;
 }
